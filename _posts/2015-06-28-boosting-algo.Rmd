@@ -6,8 +6,9 @@ title: "Boosting ALGORITHM"
 # permalink: If you need your processed blog post URLs to be something other than the default /year/month/day/title.html then you can set this variable and it will be used as the final URL.
 date: "2015 June"
 tags:
-- R 
-- model
+<<<<<<< HEAD
+- R
+- model 
 categories:
 - rstat, boosting
 # published = false => Jekyll will not process the file. Else Rmd file appears as a blog with html file i.e. 2 posts.
