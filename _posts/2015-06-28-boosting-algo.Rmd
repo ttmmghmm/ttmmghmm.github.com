@@ -1,5 +1,5 @@
 ---
-title: "BOOSTING ALGORITHM" 
+title: "Boosting ALGORITHM" 
 # fn <- "2015-05-30-spark-not-docker.Rmd"
 # library(knitr) ; knit(fn)  # produces the md file
 # pandoc(fn, format = "docx") # prodces the .docx file
@@ -41,7 +41,7 @@ plot(df)
 ```
 
 # linear-by-part regression models.
-At each iterations, there are 7 parameters to ‘estimate’, the slopes and the nodes. 
+At each iterations, there are 7 parameters to ???estimate???, the slopes and the nodes. 
 consider some constant shrinkage parameter.
 ```{r, echo=FALSE}
 v <- .05 
