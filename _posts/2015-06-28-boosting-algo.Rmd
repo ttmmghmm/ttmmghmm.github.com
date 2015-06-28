@@ -79,4 +79,4 @@ if(M>1)   y=apply(YP[,1:M],1,sum)
   lines(nd$x,sin(nd$x),lty=2)}
 
 viz(50)
-```
+``` 
