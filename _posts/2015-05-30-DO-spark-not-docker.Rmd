@@ -41,14 +41,14 @@ sudo su - -c "R -e \"library(devtools); install_github('amplab-extras/SparkR-pkg
 # library(devtools) ; install_github("amplab-extras/SparkR-pkg", subdir="pkg")
 ```
 
-follow the API, you don’t need to worry much about parallelizing for performance for your programs.
+follow the API, you don???t need to worry much about parallelizing for performance for your programs.
 ```{r}
 library(magrittr)
 library(SparkR)
 
 sc <- sparkR.init(master="local")
 sc %>% 
-  # generate a list, give it to Spark, turn it into an RDD, Spark’s Resilient Distributed Dataset structure) 
+  # generate a list, give it to Spark, turn it into an RDD, Spark???s Resilient Distributed Dataset structure) 
   parallelize(1:100000) %>%
   # and then counts the number of items in it.
   count
