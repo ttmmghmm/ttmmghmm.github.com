@@ -1,0 +1,140 @@
+---
+  yamlFileName: 2015-07-31-rvest-stringr.Rmd # WARNING: update the filename?
+# print(rmarkdown::metadata$yamlFileName) # permalink
+# library(knitr)
+# setwd("~/git/ttmmghmm.github.io/_posts") ; fn <- "2015-02-08-DBpedia.Rmd" ; knit(fn)  # to get the .md file 
+#
+# library(knitrBootstrap)
+# rmarkdown::render(fn, knitrBootstrap::bootstrap_document(), clean = FALSE) # no md?
+# produce an identical result to Knit HTML in RStudio- no run-time dependency on RStudio
+# https://github.com/jimhester/knitrBootstrap#bootstrap-themes
+#   knit(fn) ; markdownToHTML("foo.md") ; browseURL("foo.html")
+# pandoc(fn, format = "docx") # prodces the .docx file - Word doc.
+# rmarkdown::render(fn) # produces table of contents (and html?)
+# rmarkdown::render(fn, pdf_document()) # and knit2html() to get .html from .md
+title: stringr
+#
+# like categories, tags can be specified as a YAML list or a space- separated string.
+# http://en.wikipedia.org/wiki/YAML#Lists
+type: posts
+layout: post
+tags: stringr R rvest
+categories: rstats openWeatherMap
+output:
+  # https://github.com/jimhester/knitrBootstrap
+  # http://cran.r-project.org/web/packages/knitrBootstrap/README.html
+  # ::bootstrap_document custom rendering function for the Rmarkdown package.
+  knitrBootstrap::bootstrap_document: #  to create bootstrap styled HTML reports - not .md
+  # https://github.com/jimhester/knitrBootstrap#package-options
+  # title: "where does this appear? # (NULL) Set the title for the html document
+  # http://bootswatch.com/ optionally including a dynamic style switch.
+  theme: cerulean # Cyborg # monokai cyborg slate darkly superhero cerulean 
+theme.chooser: TRUE # (FALSE) - Add a bootstrap style chooser to the page.
+# highlight Set the default code style. (HighlightJS)
+# https://github.com/jimhester/knitrBootstrap#highlight-themes
+highlight: Zenburn # monokai # Sunburst # Zenburn # HighlightJs # google code 
+highlight.chooser: TRUE # (FALSE) - Add a code style chooser to the page.
+menu: TRUE # FALSE # Whether to include the bottom navbar.
+author: ttmmghmm
+---
+  
+```{r}
+library(rvest)
+library(dplyr)
+# I’ll grab an article from FiveThirtyEight.com as a show case.
+# I did my analysis on all the danish abstracts from Wikipedia (took a while!)
+# When you do your final analysis you’ll want as much text as possible too.
+
+# scrape the html data
+ 'http://fivethirtyeight.com/features/how-to-read-the-mind-of-a-supreme-court-justice/' %>% 
+  html ->
+  html_data
+# extract some text
+textfile <- html_data %>% html_nodes('p') %>% html_text(trim=TRUE)
+# collapse it in to a single string
+textfile <- textfile %>% paste(collapse= ' ')
+# do a little string manipulation
+library(stringr)
+textfile %>%
+  str_to_lower %>% # set all text to lower case
+  str_replace_all('[[:punct:]]|[[:digit:]]', '') %>% # remove punctuation and digits
+  str_split(' ') %>% # split the string into individual words
+  unlist %>%
+  unique ->
+  words
+words %>% str
+# count the letters in each word
+
+word_length <- unlist(lapply(words, function(x) nchar(x)))
+
+# And we split each word in to its individual letters
+split_words <- str_split(words, '')
+
+# Then we create a loop to find the position of each letter in each word
+# If you have national letters like we do in Denmark you icnlude them like this: for(i in c(letters, 'æ', 'ø', 'å'))
+
+for(i in letters){ # We loop through all the letters
+  
+  # Create empty list to hold data later
+  letter_place.list <- c()
+  
+  # We find the position of each letter in the words (that we split apart)
+  letter_data <- lapply(split_words, function(x) which(x == i))
+  
+  # A nested loop calculates the relative position of the letter in each word
+  for(y in 1:length(word_length)){
+    
+    # We find the relative position
+    letter_place <- unlist(lapply(letter_data[y], function(x) x/word_length[y]))
+    
+    # We add that position to a lit of positions
+    letter_place.list <- c(letter_place.list, letter_place)
+  }
+  
+  # We create a new list to hold all the data and we then add the results from the loop
+  if(!exists('letter_place.data')) letter_place.data <- list(letter_place.list) else letter_place.data <- append(letter_place.data , list(letter_place.list))
+  
+  # We make sure to name each list properly
+  names(letter_place.data)[length(letter_place.data)] <- i
+  
+}
+
+# Now we have a nested list with the data we need, but first we’ll convert it to a long form data frame
+
+# We create an empty data frame to hold the data
+letter_place.data.df <- data.frame()
+
+# Then we create a loop to put the data from each letter list into the data frame
+for(z in 1:length(letter_place.data)){ # We loop through each nested list
+  
+  tryCatch({ # I add the tryCatch so the loop doesn’t break if there is an error (can occur with if a letter is missing)
+    
+    # Here we extract the data from the letter list and create a data frame
+    loop_data <- data.frame(letter = names(letter_place.data)[z], value = letter_place.data[[z]], stringsAsFactors = F)
+    
+    # We then bind all the data frames together
+    letter_place.data.df <- rbind(letter_place.data.df, loop_data)
+    
+  }, error=function(e){}) # Ends the tryCatch
+}
+
+# We check to see if we have all the letters
+unique(letter_place.data.df$letter)
+
+# We change the letters back to upper case for aesthetics in the graphic
+letter_place.data.df$letter <- str_to_upper(letter_place.data.df$letter)
+
+library(ggplot2)
+
+# We create a density plot with free y scales to show the distribution, we choose a red fill colour and then we facet wrap it to show each individual letter
+p <- ggplot(letter_place.data.df, aes(x=value)) + geom_density(aes(fill='red')) + facet_wrap( ~ letter, scales='free_y')
+
+# We add appropriate text to titles and axis
+p <- p + labs(title = 'Where do letters typically appear in english words', y = 'Appearance', x = 'Word length', fill='')
+
+# We set a deeper red, choose the minimal theme, remove axis markers and grid, and remove the legend
+p <- p + scale_fill_brewer(palette = 'Set1″) + theme_minimal() +
+  theme(axis.ticks = element_blank(), axis.text.y = element_blank(), axis.text.x = element_blank(),
+        legend.position='none', panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+```
