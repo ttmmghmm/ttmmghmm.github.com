@@ -64,11 +64,17 @@ textfile %>%
   words
 words %>% str
 # count the letters in each word
-
-word_length <- unlist(lapply(words, function(x) nchar(x)))
+words %>%
+  lapply(nchar) %>%
+  unlist ->
+  word_length
+word_length %>% str
+# word_length <- unlist(lapply(words, function(x) nchar(x)))
 
 # And we split each word in to its individual letters
-split_words <- str_split(words, '')
+words %>% 
+  str_split('') ->
+  split_words
 
 # Then we create a loop to find the position of each letter in each word
 # If you have national letters like we do in Denmark you icnlude them like this: for(i in c(letters, 'æ', 'ø', 'å'))
