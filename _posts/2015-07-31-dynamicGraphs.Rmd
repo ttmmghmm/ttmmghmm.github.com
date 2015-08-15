@@ -3,6 +3,8 @@ runtime: shiny
 output: html_document
 ---
 
+## http://rmarkdown.rstudio.com/articles_interactive.html
+
 ### Here are two Shiny widgets
 
 ```{r echo = FALSE}
