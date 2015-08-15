@@ -6,6 +6,7 @@ output: html_document
 See [http://r.789695.n4.nabble.com/Fast-way-to-determine-number-of-lines-in-a-file-td1472962.html]
 
 ```{r}
+library(dplyr)
 pathToFilename <- R.home()  %>% 
   list.files(full.names = TRUE, patt = ".*txt$", recur = TRUE, include.dirs = TRUE)
 pathToFilename %>% head

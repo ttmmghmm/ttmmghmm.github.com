@@ -76,27 +76,19 @@ words %>%
   str_split('') ->
   split_words
 
-# Then we create a loop to find the position of each letter in each word
-# If you have national letters like we do in Denmark you icnlude them like this: for(i in c(letters, 'æ', 'ø', 'å'))
-
-for(i in letters){ # We loop through all the letters
-  
+# create a loop to find the position of each letter in each word
+for(i in letters){ # We loop through all the letters  
   # Create empty list to hold data later
-  letter_place.list <- c()
-  
+  letter_place.list <- c(
   # We find the position of each letter in the words (that we split apart)
   letter_data <- lapply(split_words, function(x) which(x == i))
-  
   # A nested loop calculates the relative position of the letter in each word
   for(y in 1:length(word_length)){
-    
     # We find the relative position
     letter_place <- unlist(lapply(letter_data[y], function(x) x/word_length[y]))
-    
     # We add that position to a lit of positions
     letter_place.list <- c(letter_place.list, letter_place)
   }
-  
   # We create a new list to hold all the data and we then add the results from the loop
   if(!exists('letter_place.data')) letter_place.data <- list(letter_place.list) else letter_place.data <- append(letter_place.data , list(letter_place.list))
   
