@@ -1,15 +1,15 @@
 ---
-title: "Boosting ALGORITHM"
-# fn <- "2015-05-30-spark-not-docker.Rmd"
+title: "titanic kaggle"
+# fn <- "2015-08-31-boosting-algo.Rmd"
 # library(knitr) ; knit(fn)  # produces the md file
 # pandoc(fn, format = "docx") # prodces the .docx file
 # permalink: If you need your processed blog post URLs to be something other than the default /year/month/day/title.html then you can set this variable and it will be used as the final URL.
-date: "2015 June"
+date: "2015 July"
 tags:
 - R
 - model 
 categories:
-- rstat, boosting
+- rstat, titanic, kaggle
 # published = false => Jekyll will not process the file. Else Rmd file appears as a blog with html file i.e. 2 posts.
 published: false 
 # output: ioslides_presentation  
@@ -85,4 +85,24 @@ missmap(df.train, main="Titanic Training Data - Missings Map",
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+barplot(table(df.train$Survived),
+        names.arg = c("Perished", "Survived"),
+        main="Survived (passenger fate)", col="black")
+barplot(table(df.train$Pclass), 
+        names.arg = c("first", "second", "third"),
+        main="Pclass (passenger traveling class)", col="firebrick")
+barplot(table(df.train$Sex), main="Sex (gender)", col="darkviolet")
+hist(df.train$Age, main="Age", xlab = NULL, col="brown")
+barplot(table(df.train$SibSp), main="SibSp (siblings + spouse aboard)", 
+        col="darkblue")
+barplot(table(df.train$Parch), main="Parch (parents + kids aboard)", 
+        col="gray50")
+hist(df.train$Fare, main="Fare (fee paid for ticket[s])", xlab = NULL, 
+     col="darkgreen")
+barplot(table(df.train$Embarked), 
+        names.arg = c("Cherbourg", "Queenstown", "Southampton"),
+        main="Embarked (port of embarkation)", col="sienna")
+```
 
