@@ -3,8 +3,25 @@ title: "sample a  line from a file"
 output: html_document
 ---
 
-See [http://r.789695.n4.nabble.com/Fast-way-to-determine-number-of-lines-in-a-file-td1472962.html]
+# http://www.regexprn.com/2008/11/read-random-line-in-large-file-in.html
 
+```{r}
+# #!/usr/bin/env python
+# import random, sys
+
+# file = open(sys.argv[1])
+# count = 0
+# to_print = cur = file.readline()
+# while cur:
+# cur = file.readline()
+# count += 1
+# if random.randint(0,count) == 0: # 1/count chance to replace
+# to_print = cur
+# 
+# print to_print[:-1] # Remove new line at end 
+```
+
+# See [http://r.789695.n4.nabble.com/Fast-way-to-determine-number-of-lines-in-a-file-td1472962.html]
 ```{r}
 library(dplyr)
 pathToFilename <- R.home()  %>% 

@@ -1,0 +1,194 @@
+---
+title: "constant maturity futures"
+output: html_document
+---
+
+```{r}
+Date: Thu, 13 Aug 2015 16:56:15 -0500
+From: G See <gsee000@gmail.com>
+  To: Samuel Wilson <samuelcoltwilson@gmail.com>
+  Cc: r-sig-finance <r-sig-finance@r-project.org>
+  Subject: Re: [R-SIG-Finance] Constant maturity Futures
+Message-ID:
+  <CA+xi=qZ2ykXsWfGY5REEvC7Ru4cxCy-TXitELw5deiq7vwv6Yg@mail.gmail.com>
+  Content-Type: text/plain; charset="utf-8"
+
+Hi Samuel,
+
+Here's some code (also attached) that creates constant maturity
+futures for VIX futures.  I wrote this code 4 years ago.  I'm not
+particularly proud of it.  I don't know for sure that it works.  It
+might not be elegant.  etc.  Take it for what it's worth.
+
+You should be able to source this code and get a time series plot of
+several different CMFs of varying maturities.  You'll need my qmao
+package which you can install with
+devtools::install_github("gsee/qmao")
+
+
+#' @export
+#' @rdname primary2expiry
+suffix2expiry <- function(suffix, root='VX', ...) {
+  if (exists(paste('suffix2expiry',root,sep="."))) {
+    do.call(paste('suffix2expiry',root,sep='.'),list(suffix, ...))
+  } else {
+    warning(paste(root, 'is not and available suffix2expiry
+                  method; using "VX" instead'))
+    do.call('suffix2expiry.VX',list(suffix, ...))
+  }
+}
+
+#' Get the expiration date of an instrument given it's primary_id
+#'
+#' \code{primary2expiry} is basically a wrapper for
+\code{\link{suffix2expiry}}.  It uses
+#' \code{\link[FinancialInstrument]{parse_id}} to split the
+\code{primary_id} into rood_id and suffix_id.
+#' then it calls the appropriate \code{\link{suffix2expiry}} method.
+#'
+#' \code{suffix2expiry} is a generic-like function.  There should be a
+method defined
+#' the "root_id".  Currently, written methods include "VX", "ES" (and
+aliases "YM", "NQ").
+#' There are links to methods help pages in the seealso section.
+#'
+#' @param primary_id character string.  Primary identifier of the instrument
+#' @param root character string. root symbol like "ES" or "VX" (NULL)
+#' @param silent silence warnings? (TRUE)
+#' @param suffix character string that indicates expiration month and
+year (and, for options, right and strike).
+#' See \code{\link[FinancialInstrument]{parse_suffix}} for examples of
+acceptable formats.
+#' @param ... any arguments to be passed to the \code{suffix2expiry} method
+#' @return expiration Date
+#' @seealso \code{\link{suffix2expiry.VX}}, \code{\link{suffix2expiry.ES}}
+#' @aliases primary2expiry, suffix2expiry
+#' @author gsee
+#' @examples
+#' primary2expiry("ESU1")
+#' suffix2expiry('V11', root='VX')
+#' @export
+#' @rdname primary2expiry
+primary2expiry <- function(primary_id, root=NULL, silent=TRUE) {
+  idlist <- parse_id(primary_id, silent=silent)
+  if (is.null(root)) root <- idlist$root
+  do.call(paste("suffix2expiry",root,sep='.'),
+          list(suffix=idlist$suffix, silent=silent))
+}
+
+
+#' VIX future contract expiration date
+#'
+#' Calculate the expiration date of a VIX future contract given a suffix_id
+#'
+#' Per the contract specs, expiration will occur on \dQuote{the Wednesday that
+#' is thirty days prior to the third Friday of the calendar month
+#' immediately following the month in which the contract expires
+("Final Settlement Date").
+#' If the third Friday of the month subsequent to expiration of the applicable
+#' VIX futures contract is a CBOE holiday, the Final Settlement Date
+for the contract
+#' shall be thirty days prior to the CBOE business day immediately
+preceding that Friday.}
+#' @param suffix suffix_id that should be something like (\sQuote{U1},
+\sQuote{U11}, or \sQuote{SEP11})
+#' @param silent silence warnings? (TRUE)
+#' @return an expiration Date
+#' @author gsee
+#' @references \url{http://cfe.cboe.com/products/spec_vix.aspx}
+#' @examples
+#' \dontrun{
+#' suffix2expiry.VX('U11')
+#' suffix2expiry.VX("JUN09")
+#' }
+#' @export
+suffix2expiry.VX <- suffix2expiry.VIX <- function(suffix, silent=TRUE) {
+  #require('timeDate')
+  sl <- parse_suffix(suffix,silent=silent)
+  DT <- as.Date(paste(15, sl$month, sl$year,sep='-'),format="%d-%b-%Y")
+  Y <- format(DT,"%Y")
+  M <- format((DT + 30),"%m")
+  if (as.numeric(M) == 1) Y <- paste(as.numeric(Y) + 1)
+  DS <- as.Date(paste(Y,M,01,sep='-'))+0:22
+  DS <- DS[months(DS, abbreviate=TRUE) == C2M()[as.numeric(M)]]
+  ds <- which(weekdays(DS) == "Friday")[3]
+  if (DS[ds] %in% as.Date(holidayNYSE(as.numeric(Y))@Data)) {
+    while (DS[ds] %in% as.Date(holidayNYSE(as.numeric(Y))@Data)
+           || any(c('Saturday', 'Sunday') == weekdays(DS[ds])))
+      ds <- ds-1
+  }
+  #try(detach(package:timeDate), silent=TRUE);
+  try(detach(package:timeSeries), silent=TRUE)
+  DS[ds] - 30
+}
+
+
+
+
+
+.interp.fut.VX <- function(x1, x2, n=36, prefer='Close') {
+  xs <- c(x1,x2) # names of 2 instruments
+  x1 <- get(x1,pos=.GlobalEnv)
+  x2 <- get(x2,pos=.GlobalEnv)
+  
+  x1$DTE <- primary2expiry(xs[1])-index(x1)#, index(x1)) #dlf(x1)
+  x2$DTE <- primary2expiry(xs[2])-index(x2)#, index(x2)) #dlf(x2)
+  df <- merge(x1$DTE,x2$DTE,all=FALSE)
+  df <- na.omit(df)
+  if (length(df[,1]) && length(df[,2])) {
+    Pcmf <- xts()
+    if(all(df[,1] < df[,2])) {
+      col1 <- 1
+      col2 <- 2
+    } else if (all(df[,2] < df[,1])) {
+      col1 <- 2
+      col2 <- 1
+    } else stop(paste("ambiguous nearby contract",xs))
+    for (ns in n) {
+      idx <- index(df[(df[,col1] <= ns) & (df[,col2] > ns)])
+      if (length(idx) == 0) return(NULL)
+      w <- 1/ns
+      P1 <- try(getPrice(x1[idx],prefer=prefer))
+      P2 <- try(getPrice(x2[idx],prefer=prefer))
+      wP <- try((w*P1) + ((1-w)*P2))
+      if (!any(sapply(list(P1,P2,wP), inherits, 'try-error')))
+        Pcmf <- cbind(Pcmf,wP)
+    }
+    #indexClass(Pcmf) <- 'Date' ## xts kind of broke this.
+    Pcmf
+  }
+}
+
+
+term.structure <- function(Symbols, cdays=c(35,60,90,120)) {
+  s <- Symbols
+  cnames <- paste(strsplit(s[[1]],"_")[[1]][1], "cm", cdays, sep=".")
+  a <- list()
+  for (i in 2:length(s)) {
+    tmp <- .interp.fut.VX(s[i-1],s[i],cdays)
+    if (length(tmp)) {
+      a[[i-1]] <- tmp
+      colnames(a[[i-1]]) <- cnames
+    }
+  }
+  #for (i in 1:length(a)) colnames(a[[i]]) <- paste("VX.CM", tdays, sep=".")
+  cb <- NULL
+  for (i in 1:length(cdays)) {
+    rb <- na.omit(a[[1]][,i])
+    for (j in 2:(length(s)-1)) {
+      if (length(a) > j && length(a[[j]][,i]) &&
+            length(na.omit(a[[j]][,i])))
+        rb <- rbind(rb, na.omit(a[[j]][,i]))
+    }
+    cb <- as.xts(cbind(cb, rb), dateFormat="Date")
+  }
+  cb
+}
+
+library(qmao)
+library(timeDate) # for holidayNYSE
+setSymbolLookup(VX='cfe')
+vx <- getSymbols('VX',Month=1:12,Year=2007:2011)
+
+plot.zoo(term.structure(vx, seq(20, 200, 20)), screens=1, col=rainbow(10))
+```
