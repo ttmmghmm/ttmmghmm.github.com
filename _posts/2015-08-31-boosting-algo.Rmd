@@ -29,54 +29,60 @@ layout: post
 author: "ttmmghmm"
 ---
 
-# http://freakonometrics.hypotheses.org/19874
 
-```{r}
-n=300
-set.seed(1)
-u=sort(runif(n)*2*pi)
-y=sin(u)+rnorm(n)/4
-df=data.frame(x=u,y=y)
-plot(df)
-```
+## titantic - kaggle
+[Source blog]<https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md>
 
-# linear-by-part regression models.
-At each iterations, there are 7 parameters to ???estimate???, the slopes and the nodes. 
-consider some constant shrinkage parameter.
-```{r, echo=FALSE}
-v <- .05 
-library(splines)
-fit <- lm(y ~ bs(x, degree = 1, df = 3), data = df)
-yp <- predict(fit, newdata = df)
-df$yr <- df$y - v * yp
-YP <- v * yp
-```
 
-This is the implementation of the algorithm described above,
-```{r}
-for(t in 1:100){
-  fit=lm(yr~bs(x,degree=1,df=3),data=df)
-  yp=predict(fit,newdata=df)
-  df$yr=df$yr - v*yp
-  YP=cbind(YP,v*yp)
+```{r, define readData}
+readData <- function(path.name, file.name, column.types, missing.types) {
+  read.csv( url( paste(path.name, file.name, sep="") ), 
+            colClasses=column.types,
+            na.strings=missing.types )
 }
-str(YP)
+```
+```{r, get data}
+Titanic.path <- "https://raw.github.com/wehrley/Kaggle_Titanic/master/"
+train.data.file <- "train.csv"
+test.data.file <- "test.csv"
+missing.types <- c("NA", "")
+train.column.types <- c('integer',   # PassengerId
+                        'factor',    # Survived 
+                        'factor',    # Pclass
+                        'character', # Name
+                        'factor',    # Sex
+                        'numeric',   # Age
+                        'integer',   # SibSp
+                        'integer',   # Parch
+                        'character', # Ticket
+                        'numeric',   # Fare
+                        'character', # Cabin
+                        'factor'     # Embarked
+)
+test.column.types <- train.column.types[-2]     # # no Survived column in test.csv
+
 ```
 
-The red line is the initial guess we have, without boosting, using a simple call of the regression function. 
-The blue one is the one obtained using boosting. 
-The dotted line is the true model.
-```{r}
-nd=data.frame(x=seq(0,2*pi,by=.01))
-viz=function(M){
-if(M==1)  y=YP[,1]
-if(M>1)   y=apply(YP[,1:M],1,sum)
-  plot(df$x,df$y,ylab="",xlab="")
-  lines(df$x,y,type="l",col="red",lwd=3)
-  fit=lm(y~bs(x,degree=1,df=3),data=df)
-  yp=predict(fit,newdata=nd)
-  lines(nd$x,yp,type="l",col="blue",lwd=3)
-  lines(nd$x,sin(nd$x),lty=2)}
 
-viz(50)
-``` 
+You can also embed plots, for example:
+
+```{r, read in data - https}
+train.raw <- readData(Titanic.path, train.data.file, 
+                      train.column.types, missing.types)
+df.train <- train.raw
+test.raw <- readData(Titanic.path, test.data.file, 
+                     test.column.types, missing.types)
+df.infer <- test.raw   
+str(df.infer)
+str(df.train)
+```
+```{r, echo= FALSE}
+## map missing data by provided feature
+require(Amelia)
+missmap(df.train, main="Titanic Training Data - Missings Map", 
+        col=c("yellow", "black"), legend=FALSE)
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
