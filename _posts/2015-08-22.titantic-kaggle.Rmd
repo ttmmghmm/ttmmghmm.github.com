@@ -1,0 +1,24 @@
+---
+title: "Titanic tutorial - kaggle"
+output: html_document
+---
+
+# https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md
+[Source blog]<https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md>
+
+
+```{r}
+readData <- function(path.name, file.name, column.types, missing.types) {
+  read.csv( url( paste(path.name, file.name, sep="") ), 
+            colClasses=column.types,
+            na.strings=missing.types )
+}
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
