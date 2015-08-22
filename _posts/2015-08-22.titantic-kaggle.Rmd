@@ -3,22 +3,58 @@ title: "Titanic tutorial - kaggle"
 output: html_document
 ---
 
-# https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md
+## titantic - kaggle
 [Source blog]<https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md>
 
 
-```{r}
+```{r, define readData}
 readData <- function(path.name, file.name, column.types, missing.types) {
   read.csv( url( paste(path.name, file.name, sep="") ), 
             colClasses=column.types,
             na.strings=missing.types )
 }
 ```
+```{r, get data}
+Titanic.path <- "https://raw.github.com/wehrley/Kaggle_Titanic/master/"
+train.data.file <- "train.csv"
+test.data.file <- "test.csv"
+missing.types <- c("NA", "")
+train.column.types <- c('integer',   # PassengerId
+                        'factor',    # Survived 
+                        'factor',    # Pclass
+                        'character', # Name
+                        'factor',    # Sex
+                        'numeric',   # Age
+                        'integer',   # SibSp
+                        'integer',   # Parch
+                        'character', # Ticket
+                        'numeric',   # Fare
+                        'character', # Cabin
+                        'factor'     # Embarked
+)
+test.column.types <- train.column.types[-2]     # # no Survived column in test.csv
+
+```
+
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
-plot(cars)
+```{r, read in data - https}
+train.raw <- readData(Titanic.path, train.data.file, 
+                      train.column.types, missing.types)
+df.train <- train.raw
+test.raw <- readData(Titanic.path, test.data.file, 
+                     test.column.types, missing.types)
+df.infer <- test.raw   
+str(df.infer)
+str(df.train)
+```
+```{r, echo= FALSE}
+## map missing data by provided feature
+require(Amelia)
+missmap(df.train, main="Titanic Training Data - Missings Map", 
+        col=c("yellow", "black"), legend=FALSE)
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
