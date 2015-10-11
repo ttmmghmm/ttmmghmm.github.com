@@ -441,6 +441,8 @@ test.batch <- df.train.munged[-ind, ]
 Before I go pouring features into the popular Random Forest method, I'm going to give one of the simplest classification methods a crack at the Titanic prediction challenge.  Logistic regression, which surfaced about 70 years ago, has been used extensively in multiple fields.  I'll start simple by passing essentially the features provided in the raw training data (remember that we combined ``` SibSp``` and ``` Parch``` to form ``` Family```) through the R function for fitting general linearized models.  When entering the model formula, I typically have a habit of listing the features in an order roughly corresponding to what I initially believe their importance will be.  In this case, I've ordered them roughly by the two main themes I discussed earlier (women & children first policy and location on the ship).  By setting the argument ``` family``` to ``` binomial``` with a ``` logit``` link, I'm asking ``` glm( )``` to produce a logistic regression.
 
 ```{r}
-#Titanic.logit.1 <- glm(Fate ~ Sex + Class + Age + Family + Embarked + Fare, 
-#                       data = train.batch, family=binomial("logit")
+Titanic.logit.1 <- glm(Fate ~ Sex + Class + Age + Family + Embarked + Fare, 
+                       data = train.batch, family=binomial("logit")
+)
+Titanic.logit.1
 ```
