@@ -19,25 +19,19 @@ suffix2expiry <- function(suffix, root='VX', ...) {
 
 #' Get the expiration date of an instrument given it's primary_id
 #'
-#' \code{primary2expiry} is basically a wrapper for
-\code{\link{suffix2expiry}}.  It uses
-#' \code{\link[FinancialInstrument]{parse_id}} to split the
-\code{primary_id} into rood_id and suffix_id.
+#' \code{primary2expiry} is basically a wrapper for \code{\link{suffix2expiry}}.  It uses
+#' \code{\link[FinancialInstrument]{parse_id}} to split the \code{primary_id} into rood_id and suffix_id.
 #' then it calls the appropriate \code{\link{suffix2expiry}} method.
 #'
-#' \code{suffix2expiry} is a generic-like function.  There should be a
-method defined
-#' the "root_id".  Currently, written methods include "VX", "ES" (and
-aliases "YM", "NQ").
+#' \code{suffix2expiry} is a generic-like function.  There should be a method defined
+#' the "root_id".  Currently, written methods include "VX", "ES" (and aliases "YM", "NQ").
 #' There are links to methods help pages in the seealso section.
 #'
 #' @param primary_id character string.  Primary identifier of the instrument
 #' @param root character string. root symbol like "ES" or "VX" (NULL)
 #' @param silent silence warnings? (TRUE)
-#' @param suffix character string that indicates expiration month and
-year (and, for options, right and strike).
-#' See \code{\link[FinancialInstrument]{parse_suffix}} for examples of
-acceptable formats.
+#' @param suffix character string that indicates expiration month and year (and, for options, right and strike).
+#' See \code{\link[FinancialInstrument]{parse_suffix}} for examples of acceptable formats.
 #' @param ... any arguments to be passed to the \code{suffix2expiry} method
 #' @return expiration Date
 #' @seealso \code{\link{suffix2expiry.VX}}, \code{\link{suffix2expiry.ES}}
@@ -62,5 +56,5 @@ library(timeDate) # for holidayNYSE
 setSymbolLookup(VX='cfe')
 vx <- getSymbols('VX',Month=1:12,Year=2007:2011)
 
-plot.zoo(term.structure(vx, seq(20, 200, 20)), screens=1, col=rainbow(10))
+# plot.zoo(term.structure(vx, seq(20, 200, 20)), screens=1, col=rainbow(10))
 ```
