@@ -6,6 +6,9 @@ layout: post
 author: "ttmmghmm"
 ---
 
+asdf asdfasdfasd
+f
+
 # http://www.regexprn.com/2008/11/read-random-line-in-large-file-in.html
 ```{r}
 momersion <- function(R, n, returnLag = 1) {

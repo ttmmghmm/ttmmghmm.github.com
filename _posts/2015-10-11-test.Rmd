@@ -1,10 +1,12 @@
 ---
 title: "test"
 output: html_document
+layout: post
+author: "ttmmghmm"
 ---
 
 test
-
+ 
 
 ```{r}
 suffix2expiry <- function(suffix, root='VX', ...) {
