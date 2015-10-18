@@ -1,8 +1,14 @@
 ---
 title: "test"
-output: html_document
 layout: post
 author: "ttmmghmm"
+published: false 
+# output: ioslides_presentation  
+output:
+  html_fragment: 
+    toc: true
+    number_sections: true
+    keep_md: false
 ---
 
 test
