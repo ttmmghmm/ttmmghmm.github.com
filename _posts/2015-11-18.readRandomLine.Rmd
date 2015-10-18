@@ -1,6 +1,9 @@
 ---
 title: "sample a  line from a file"
+date: "2015 July"
 output: html_document
+layout: post
+author: "ttmmghmm"
 ---
 
 # http://www.regexprn.com/2008/11/read-random-line-in-large-file-in.html
