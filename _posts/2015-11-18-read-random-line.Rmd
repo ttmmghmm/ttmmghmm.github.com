@@ -1,9 +1,12 @@
 ---
-title: "sample a  line from a file"
-date: "2015 July"
-output: html_document
 layout: post
-author: "ttmmghmm"
+title: trim TD files with shiny
+tags: [oce,R]
+category: R
+year: 2015
+month: 10
+day: 18
+summary: pplication to trim CTD data.
 ---
 
 asdf asdfasdfasd
