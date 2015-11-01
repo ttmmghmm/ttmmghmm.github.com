@@ -1,5 +1,5 @@
 ---
-title: "titanic kaggle"
+title: "tit jhk jb hkh kl"
 # fn <- "2015-08-31-boosting-algo.Rmd"
 # library(knitr) ; knit(fn)  # produces the md file
 # pandoc(fn, format = "docx") # prodces the .docx file
@@ -30,7 +30,7 @@ author: "ttmmghmm"
 ---
 
 
-## titantic - kaggle
+## gjh jh  - hh kj kj k
 [Source blog]<https://github.com/wehrley/wehrley.github.io/blob/master/SOUPTONUTS.md>
 
 
