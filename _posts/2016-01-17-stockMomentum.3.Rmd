@@ -1,0 +1,29 @@
+---
+layout: post
+title: stock momentum
+tags: [momemtum, R]
+category: R
+year: 2016
+month: 01
+day: 17
+summary: pplication to trim CTD data.
+---
+
+
+# https://www.donfishback.com/2016/01/panic-selling-a-pause-then-another-smash-whats-next/
+
+* S&P 500 ($SPX) closes down more than 1% for three straight days.
+* Each close is a new 20-day low.
+* The final close on the third day is below the 200-day moving average.
+
+```{r}
+momersion <- function(R, n, returnLag = 1) {
+  momentum <- sign(R * lag(R, returnLag))
+  momentum[momentum < 0] <- 0
+  momersion <- runSum(momentum, n = n)/n * 100
+  colnames(momersion) <- "momersion"
+  return(momersion)
+}
+
+```
+
