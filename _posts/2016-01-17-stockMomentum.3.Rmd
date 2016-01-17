@@ -1,12 +1,9 @@
 ---
 layout: post
 title: stock momentum
-tags: [momemtum, R]
-category: R
 year: 2016
 month: 01
 day: 17
-summary: pplication to trim CTD data.
 ---
 
 
